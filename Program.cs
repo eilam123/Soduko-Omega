@@ -1,3 +1,13 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using Soduko_Omega;
 
-Console.WriteLine("Hello, World!");
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        //create a new instance of the ConsoleInputHandler class
+        ConsoleInputHandler inputHandler = new ConsoleInputHandler(9);
+        Console.WriteLine(inputHandler);
+        
+        
+    }
+}
