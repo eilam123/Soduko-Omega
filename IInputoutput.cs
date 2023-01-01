@@ -2,6 +2,6 @@
 
 public interface IInputoutput
 {
-    void ReadInput(int boardSize);
-    bool ValidateInput(int boardSize);
+    void ReadInput();
+    bool ValidateInput();
 }

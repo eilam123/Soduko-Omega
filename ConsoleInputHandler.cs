@@ -5,41 +5,41 @@
     {
         private string? input;
 
-        public ConsoleInputHandler(int boardSize)
+        public ConsoleInputHandler()
         {
-            ReadInput(boardSize);
+            ReadInput();
         }
 
-        public void ReadInput(int boardSize)
+        public void ReadInput()
         {
             input = Console.ReadLine();
-            if (!ValidateInput(boardSize))
+            if (!ValidateInput())
             {
                 input = null;
             }
 
         }
 
-        public bool ValidateInput(int boardSize)
+        public bool ValidateInput()
         {
             if (input == null)
             {
                 return false;
             }
 
-            if (input.Length != Math.Pow(boardSize, 2))
+            if (Math.Sqrt(Math.Sqrt(input.Length))-Math.Floor(Math.Sqrt(Math.Sqrt(input.Length))) != 0)
             {
                 return false;
             }
-
+            
 
             foreach (char c in input)
             {
-                if (!(c >= '0' && c <= '0' + boardSize))
+                if (!(c >= '0' && c <= '0' + Math.Sqrt(input.Length)))
                 {
                     return false;
                 }
-
+                
             }
 
             return true;
