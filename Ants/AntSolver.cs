@@ -1,17 +1,36 @@
 ﻿namespace Soduko_Omega.Ants;
 
+/// <summary>
+/// Class representing the Ant Solver for Sudoku
+/// </summary>
 public class AntSolver
 {
+    // Array of ants
     private readonly Ant[]? _ants;
+    // Pheromone evaporation rate for the best solution
     private readonly double _bestPherEvap;
+    // Board to be solved
     private readonly Board? _board;
+    // Global pheromone update rate
     private readonly double _globalPherUpdate;
+    // Initial pheromone value
     private readonly double _initialPhervalue;
+    // Number of ants
     private readonly int _numAnts;
+    // Pheromone matrix
     private readonly double[,,]? _pherMatrix;
+    // Best pheromone to add
     private double _bestPherToAdd;
+    // Solution board
     private Board? _solution;
 
+    /// <summary>
+    /// Constructor for AntSolver
+    /// </summary>
+    /// <param name="board">Board to be solved</param>
+    /// <param name="globalPherUpdate">Global pheromone update rate</param>
+    /// <param name="bestPherEvap">Pheromone evaporation rate for the best solution</param>
+    /// <param name="numAnts">Number of ants</param>
     public AntSolver(Board? board, double globalPherUpdate, double bestPherEvap, int numAnts)
     {
         _board = board;
@@ -25,13 +44,17 @@ public class AntSolver
             _ants = new Ant[_numAnts];
             _pherMatrix = new double[board.boardLen, board.boardLen, board.boardLen];
             for (var i = 0; i < board.boardLen; i++)
-            for (var j = 0; j < board.boardLen; j++)
-            for (var k = 0; k < board.boardLen; k++)
-                _pherMatrix[i, j, k] = _initialPhervalue;
+                for (var j = 0; j < board.boardLen; j++)
+                    for (var k = 0; k < board.boardLen; k++)
+                        _pherMatrix[i, j, k] = _initialPhervalue;
         }
 
         _bestPherToAdd = 0;
     }
+
+    /// <summary>
+    /// Method to update the global pheromone matrix
+    /// </summary>
 
     private void GlobalPheromoneMatrixUpdate()
     {
@@ -48,7 +71,12 @@ public class AntSolver
                                 _globalPherUpdate * _bestPherToAdd;
                 }
     }
-
+    /// <summary>
+    /// Method to solve the Sudoku board using Ant Colony Optimization
+    /// </summary>
+    /// <param name="localPherUpdate">Local pheromone update rate</param>
+    /// <param name="greediness">Greediness factor for the ants</param>
+    /// <returns>Solved board</returns>
     public Board? Solve(double localPherUpdate, double greediness)
     {
         var solved = false;
@@ -57,12 +85,9 @@ public class AntSolver
         while (!solved)
         {
             var random = new Random();
-            // ConstraintPropagation.NakedSingle(board);
-            // ConstraintPropagation.HiddenSingle(board);
             var emptyCells = _board?.GetEmptyCells() ?? new List<Tuple<int, int>>();
             for (var i = 0; i < _numAnts; i++)
-                // do not use random take the next empty cell
-                // var cell = _board?.GetCellWithFewestPossibilities();
+                
                 if (emptyCells.Count > _numAnts)
                 {
                     var randomNumber1 = random.Next(0, emptyCells.Count - 1);
@@ -77,8 +102,8 @@ public class AntSolver
                 }
                 else
                 {
-                    var randomNumber2 = random.Next(0, emptyCells.Count - 1);
-                    var randomNumber1 = random.Next(0, emptyCells.Count - 1);
+                    var randomNumber2 = random.Next(0, _board.boardLen - 1);
+                    var randomNumber1 = random.Next(0, _board.boardLen - 1);
                     var startPos = new Tuple<int, int>(randomNumber1, randomNumber2);
                     var boardCopy = (Board)_board.Clone();
                     if (_ants != null)

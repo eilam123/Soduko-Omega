@@ -12,15 +12,18 @@ public class FileInputHandler : IInputoutput
     {
         ReadInput();
     }
-
+    /// <summary>
+    /// This method reads the input from a file. It prompts the user for a file path, reads the file and calls the ValidateInput method
+    /// </summary>
     public void ReadInput()
     {
         _filePath = Console.ReadLine();
         _input = File.ReadAllText(_filePath);
         ValidateInput();
     }
-
-    //add doxumentation
+    /// <summary>
+    /// This method validates the input. It checks if the input is null, if it has a perfect fourth root, and if it only contains valid characters
+    /// </summary>
     public void ValidateInput()
     {
         if (_input == null) throw new InvalidBoardException("can't enter empty board");
@@ -34,12 +37,18 @@ public class FileInputHandler : IInputoutput
             if (!(c >= '0' && c <= '0' + Math.Sqrt(_input.Length)))
                 throw new InvalidCharException();
     }
-
+    /// <summary>
+    /// This method returns the input string
+    /// </summary>
+    /// <returns>Input string</returns>
     public override string? ToString()
     {
         return _input;
     }
-
+    /// <summary>
+    /// This method takes a string parameter and writes it to the file specified by _filePath
+    /// </summary>
+    /// <param name="solved">string to write</param>
     public void PrintString(string solved)
     {
         File.WriteAllText(_filePath, solved);

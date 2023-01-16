@@ -1,43 +1,33 @@
 ﻿namespace Soduko_Omega;
-
+/// <summary>
+/// A static class that implements various constraint propagation techniques for solving a Sudoku puzzle
+/// </summary>
 public static class ConstraintPropagation
 {
-    /*public static bool NakedSingle(AntBoard? board, Cell cell)
+    /// <summary>
+    /// Method that runs all the constraint propagation techniques on the given board
+    /// </summary>
+    /// <param name="board">The board to run the constraint propagation techniques on</param>
+    public static void RunConstraintPropagation(Board? board)
     {
-        bool changed = false;
-        for (int row = 0; row < board.boardLen; row++)
+        var succeedConstraintPropagation = 0;
+        do
         {
-            for (int col = 0; col < board.boardLen; col++)
-            {
-                if (board.board[row, col].PossibleValues.Count == 1)
-                {
-                    board.board[row, col].Value = board.board[row, col].PossibleValues[0];
-                    board.board[row, col].PossibleValues.Clear();
-                    RemoveValueOfCellFromPeers(board.board[row, col], board);
-                    changed = true;
-                }
-            }
-        }
-
-        return changed;
-    }*/
-    public static bool NakedSingle(Board? board, Cell cell)
-    {
-        var changed = false;
-
-        foreach (var (row, col) in cell.RowPeers2)
-            if (board.board[row, col].PossibleValues.Count == 1)
-            {
-                board.board[row, col].Value = board.board[row, col].PossibleValues[0];
-                board.board[row, col].PossibleValues.Clear();
-                RemoveValueOfCellFromPeers(board.board[row, col], board);
-                changed = true;
-            }
-
-
-        return changed;
+            succeedConstraintPropagation = 0;
+            if (NakedSingle(board))
+                succeedConstraintPropagation++;
+            if (HiddenSingle(board))
+                succeedConstraintPropagation++;
+            if (NakedPairs(board))
+                succeedConstraintPropagation++;
+           
+        } while (succeedConstraintPropagation > 0);
     }
-
+    /// <summary>
+    /// Method that applies the Naked Single constraint propagation technique on the entire board
+    /// </summary>
+    /// <param name="board">The board to apply the technique on</param>
+    /// <returns>True if the technique was successful, False otherwise</returns>
     public static bool NakedSingle(Board? board)
     {
         var changed = false;
@@ -54,12 +44,20 @@ public static class ConstraintPropagation
 
         return changed;
     }
-
+    /// <summary>
+    /// Method that removes the value of a specific cell from its peers' possible values
+    /// </summary>
+    /// <param name="cell">The cell whose value to remove</param>
+    /// <param name="board">The board containing the cell and its peers</param>
     public static void RemoveValueOfCellFromPeers(Cell cell, Board board)
     {
         foreach (var (row, col) in cell.Peers) board.board[row, col].PossibleValues.Remove(cell.Value);
     }
-
+    /// <summary>
+    /// Method that applies the Naked Pairs constraint propagation technique on the entire board
+    /// </summary>
+    /// <param name="board">The board to apply the technique on</param>
+    /// <returns>True if the technique was successful, False otherwise</returns>
     public static bool NakedPairs(Board? board)
     {
         var changed = false;
@@ -86,77 +84,12 @@ public static class ConstraintPropagation
     }
 
 
-    /*public static bool HiddenSingle(AntBoard? board)
-    {
-        bool changed = false;
-        for (int row = 0; row < board.boardLen; row++)
-        {
-            for (int col = 0; col < board.boardLen; col++)
-            {
-                if (board.board[row, col].Value == '0')
-                {
-                    for (char i = '1'; i <= board.boardLen + '0'; i++)
-                    {
-                        if (board.board[row, col].PossibleValues.Contains(i))
-                        {
-                            bool found = false;
-                            foreach (var (row2, col2) in board.board[row, col].RowPeers)
-                            {
-                                if (board.board[row2, col2].PossibleValues.Contains(i))
-                                {
-                                    found = true;
-                                    break;
-                                }
-                            }
-
-                            if (!found)
-                            {
-                                board.board[row, col].Value = i;
-                                board.board[row, col].PossibleValues.Clear();
-                                changed = true;
-                            }
-
-                            found = false;
-                            foreach (var (row2, col2) in board.board[row, col].ColPeers)
-                            {
-                                if (board.board[row2, col2].PossibleValues.Contains(i))
-                                {
-                                    found = true;
-                                    break;
-                                }
-                            }
-
-                            if (!found)
-                            {
-                                board.board[row, col].Value = i;
-                                board.board[row, col].PossibleValues.Clear();
-                                changed = true;
-                            }
-
-                            found = false;
-                            foreach (var (row2, col2) in board.board[row, col].BoxPeers)
-                            {
-                                if (board.board[row2, col2].PossibleValues.Contains(i))
-                                {
-                                    found = true;
-                                    break;
-                                }
-                            }
-
-                            if (!found)
-                            {
-                                board.board[row, col].Value = i;
-                                board.board[row, col].PossibleValues.Clear();
-                                changed = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return changed;
-    }*/
+    /// <summary>
+    /// Method that applies the Hidden Single constraint propagation technique on a specific row
+    /// </summary>
+    /// <param name="cell">The cell to use as a starting point for the row</param>
+    /// <param name="board">The board containing the cell and its peers</param>
+    /// <returns>True if the technique was successful, False otherwise</returns>
     public static bool HiddenSingle(Board? board)
     {
         var happened = false;
@@ -262,127 +195,5 @@ public static class ConstraintPropagation
 
         return true;
     }
-    /*
-    public static bool HiddenSingleForUnit(Cell[] cellArray)
-    {
-        List<char>[] lists = new List<char>[cellArray.Length];
-        for (int i = 0; i < cellArray.Length; i++)
-        {
-            lists[i] = cellArray[i].PossibleValues;
-        }
-
-        var uniqueChars = lists.SelectMany((l, index) => l.Select(c => (c, index)))
-            .GroupBy(p => p.c)
-            .Where(g => g.Count() == 1)
-            .Select(g => g.First())
-            .ToList();
-        if (uniqueChars.Count == 0)
-            return false;
-        foreach (var (c, index) in uniqueChars)
-        {
-            cellArray[index].Value = c;
-            cellArray[index].PossibleValues.Clear();
-            for (int i = 0; i < cellArray.Length; i++)
-            {
-                if (i != index)
-                {
-                    cellArray[i].PossibleValues.Remove(c);
-                }
-            }
-        }
-
-        return true;
-    }
-    */
-
-    public static bool HiddenPairs(Board? board)
-    {
-        var changed = false;
-        var count = 0;
-        var TempRow = -1;
-        var TempCol = -1;
-        for (var row = 0; row < board.boardLen; row++)
-        for (var col = 0; col < board.boardLen; col++)
-            if (board.board[row, col].Value == '0')
-                for (var i = '1'; i <= board.boardLen + '0'; i++)
-                    if (board.board[row, col].PossibleValues.Contains(i))
-                        for (var j = (char)(i + 1); j <= board.boardLen + '0'; j++)
-                            if (board.board[row, col].PossibleValues.Contains(j))
-                            {
-                                foreach (var (row2, col2) in board.board[row, col].Peers)
-                                {
-                                    if (board.board[row2, col2].PossibleValues.Contains(i) &&
-                                        board.board[row2, col2].PossibleValues.Contains(j))
-                                    {
-                                        count++;
-                                        TempRow = row2;
-                                        TempCol = col2;
-                                    }
-
-                                    if (count > 1) break;
-                                }
-
-                                if (count == 1)
-                                {
-                                    board.board[TempRow, TempCol].PossibleValues.Clear();
-                                    board.board[TempRow, TempCol].PossibleValues.Add(i);
-                                    board.board[TempRow, TempCol].PossibleValues.Add(j);
-                                    board.board[row, col].PossibleValues.Clear();
-                                    board.board[row, col].PossibleValues.Add(i);
-                                    board.board[row, row].PossibleValues.Add(j);
-                                    changed = true;
-                                }
-
-                                count = 0;
-                            }
-
-        return changed;
-    }
-
-    public static bool HiddenTriples(Board? board)
-    {
-        var changed = false;
-        var count = 0;
-        var TempRow = -1;
-        var TempCol = -1;
-        for (var row = 0; row < board.boardLen; row++)
-        for (var col = 0; col < board.boardLen; col++)
-            if (board.board[row, col].Value == '0')
-                for (var i = '1'; i <= board.boardLen + '0'; i++)
-                    if (board.board[row, col].PossibleValues.Contains(i))
-                        for (var j = (char)(i + 1); j <= board.boardLen + '0'; j++)
-                            if (board.board[row, col].PossibleValues.Contains(j))
-                                for (var k = (char)(j + 1); k <= board.boardLen + '0'; k++)
-                                    if (board.board[row, col].PossibleValues.Contains(k))
-                                    {
-                                        foreach (var (row2, col2) in board.board[row, col].Peers)
-                                        {
-                                            if (board.board[row2, col2].PossibleValues.Contains(i) &&
-                                                board.board[row2, col2].PossibleValues.Contains(j) &&
-                                                board.board[row2, col2].PossibleValues.Contains(k))
-                                            {
-                                                count++;
-                                                TempRow = row2;
-                                                TempCol = col2;
-                                            }
-
-                                            if (count > 2) break;
-                                        }
-
-                                        if (count == 2)
-                                        {
-                                            board.board[TempRow, TempCol].PossibleValues.Clear();
-                                            board.board[TempRow, TempCol].PossibleValues.Add(i);
-                                            board.board[TempRow, TempCol].PossibleValues.Add(j);
-                                            board.board[row, col].PossibleValues.Clear();
-                                            board.board[row, col].PossibleValues.Add(i);
-                                            board.board[row, row].PossibleValues.Add(j);
-                                            changed = true;
-                                        }
-
-                                        count = 0;
-                                    }
-
-        return changed;
-    }
+ 
 }

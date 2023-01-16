@@ -11,14 +11,17 @@ public class ConsoleInputHandler : IInputoutput
     {
         ReadInput();
     }
-
+    /// <summary>
+    /// This method reads input from the console
+    /// </summary>
     public void ReadInput()
     {
         _input = Console.ReadLine();
         ValidateInput();
     }
-
-    //add doxumentation
+    /// <summary>
+    /// This method validates the input. It checks if the input is null, if it has a perfect fourth root, and if it only contains valid characters
+    /// </summary>
     public void ValidateInput()
     {
         if (_input == null) throw new InvalidBoardException("can't enter empty board");
@@ -32,12 +35,18 @@ public class ConsoleInputHandler : IInputoutput
             if (!(c >= '0' && c <= '0' + Math.Sqrt(_input.Length)))
                 throw new InvalidCharException();
     }
-
+    /// <summary>
+    /// This method returns the input string
+    /// </summary>
+    /// <returns>Input string</returns>
     public override string? ToString()
     {
         return _input;
     }
-
+    /// <summary>
+    /// This method takes a string parameter and prints it to the console
+    /// </summary>
+    /// <param name="solved">string to print</param>
     public void PrintString(string solved)
     {
         Console.WriteLine(solved);

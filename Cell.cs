@@ -1,14 +1,22 @@
 ﻿namespace Soduko_Omega;
-
+/// <summary>
+/// Class representing a Cell in the Sudoku board
+/// </summary>
 public class Cell
 {
+    /// <summary>
+    /// Constructor for a Cell
+    /// </summary>
+    /// <param name="value">Value of the cell</param>
+    /// <param name="row">Row of the cell</param>
+    /// <param name="column">Column of the cell</param>
+    /// <param name="boardLen">Size of the board</param>
     public Cell(char value, int row, int column, int boardLen)
     {
         Value = value;
         IsFixed = value != '0';
         Row = row;
         Column = column;
-        // Box = (row / 3) * 3 + (column / 3);
         PossibleValues = new List<char>();
         Peers = new List<Tuple<int, int>>();
         RowPeers = new List<Tuple<int, int>>();
@@ -50,40 +58,57 @@ public class Cell
             if (r != Row || c != Column) BoxPeers.Add(new Tuple<int, int>(r, c));
         }
     }
-
+    /// <summary>
+    /// Value of the cell
+    /// </summary>
     public char Value { get; set; }
-
+    /// <summary>
+    /// Flag indicating if the value of the cell is fixed
+    /// </summary>
     public bool IsFixed { get; set; }
-
+    /// <summary>
+    /// Row of the cell
+    /// </summary>
     public int Row { get; set; }
-
+    /// <summary>
+    /// Column of the cell
+    /// </summary>
     public int Column { get; set; }
-
-    // private int Box { get; set; }
+    /// <summary>
+    /// List of possible values for the cell
+    /// </summary>
     public List<char> PossibleValues { get; set; }
+    /// <summary>
+    /// List of cell peers (peers are cells that share a row, column or box)
+    /// </summary>
     public List<Tuple<int, int>> Peers { get; set; }
+    /// <summary>
+    /// List of cell's row peers
+    /// </summary>
     public List<Tuple<int, int>> RowPeers { get; set; }
+    /// <summary>
+    /// List of cell's column peers
+    /// </summary>
     public List<Tuple<int, int>> ColPeers { get; set; }
+    /// <summary>
+    /// List of cell's box peers
+    /// </summary>
     public List<Tuple<int, int>> BoxPeers { get; set; }
+    /// <summary>
+    /// List of cell's row peers
+    /// </summary>
     public List<Tuple<int, int>> RowPeers2 { get; set; }
+    /// <summary>
+    /// List of cell's column peers
+    /// </summary>
     public List<Tuple<int, int>> ColPeers2 { get; set; }
-
+    /// <summary>
+    /// List of cell's box peers
+    /// </summary>
     public List<Tuple<int, int>> BoxPeers2 { get; set; }
-    /*public Object Clone()
-    {
-        Cell cell = new Cell(Value, Row, Column);
-        cell.IsFixed = IsFixed;
-        cell.IsSolved = IsSolved;
-        cell.PossibleValues = new List<char>(PossibleValues);
-        return cell;
-    }*/
-
-    public override string ToString()
-    {
-        // return $"Value: {Value}, IsFixed: {IsFixed}, IsSolved: {IsSolved}, Row: {Row}, Column: {Column}, PossibleValues: {string.Join(", ", PossibleValues)}";
-        return $"Value: {Value},  Row: {Row}, Column: {Column}, PossibleValues: {string.Join(", ", PossibleValues)}";
-    }
-
+    /// <summary>
+    /// List of cell's box peers
+    /// </summary>
     public bool Failed()
     {
         return PossibleValues.Count == 0;

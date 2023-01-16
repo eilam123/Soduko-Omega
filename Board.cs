@@ -5,7 +5,11 @@ namespace Soduko_Omega;
 public class Board : ICloneable
 {
     public Cell[,] board;
-
+    /// <summary>
+    /// this builds the board from the input string, the board is an array of cells
+    /// </summary>
+    /// <param name="io"></param>
+    /// <exception cref="InvalidBoardException"></exception>
     public Board(IInputoutput io)
     {
         var input = io.ToString();
@@ -15,7 +19,6 @@ public class Board : ICloneable
 
         for (var i = 0; i < boardLen; i++)
         for (var j = 0; j < boardLen; j++)
-            //inout[i* bordLen /+j] is an unclear statement
             board[i, j] = new Cell(input[i * boardLen + j], i, j, boardLen);
 
         if (!IsValid()) throw new InvalidBoardException();
@@ -29,8 +32,11 @@ public class Board : ICloneable
     }
 
     public int boardLen { get; set; }
-    public int AmountOfFilledCells { get; set; } // by ants
-
+    public int AmountOfFilledCells { get; set; }
+    /// <summary>
+    /// implentation of ICloneable interface for deep copy
+    /// </summary>
+    /// <returns>new object type object</returns>
     public object Clone()
     {
         var newBoard = new Board(boardLen);
@@ -44,13 +50,21 @@ public class Board : ICloneable
 
         return newBoard;
     }
-
+    /// <summary>
+    /// get the cell at the given coordinates
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <returns>Cell object</returns>
     public Cell GetCell(Tuple<int, int> pos)
     {
         return board[pos.Item1, pos.Item2];
     }
 
-
+    /// <summary>
+    /// set the cell at the given coordinates
+    /// </summary>
+    /// <param name="pos"></param>
+    /// <param name="value"></param>
     public void SetCell(Tuple<int, int> pos, char value)
     {
         var cell = GetCell(pos);
@@ -61,7 +75,10 @@ public class Board : ICloneable
         board[pos.Item1, pos.Item2] = cell;
         board[pos.Item1, pos.Item2].PossibleValues.Clear();
     }
-
+    /// <summary>
+    /// this method returns list of the possitions of the empty cells in the board
+    /// </summary>
+    /// <returns>list of tuples</returns>
     public List<Tuple<int, int>> GetEmptyCells()
     {
         var list = new List<Tuple<int, int>>();
@@ -72,7 +89,10 @@ public class Board : ICloneable
 
         return list;
     }
-
+    /// <summary>
+    /// this method returns the num of filled cells in the board
+    /// </summary>
+    /// <returns>count</returns>
     public int NumOfFixedCells()
     {
         var count = 0;
@@ -82,26 +102,33 @@ public class Board : ICloneable
 
         return count;
     }
-
-    //function that builds for each cell a list of possible values
+    /// <summary>
+    ///function that builds for each cell a list of possible values
+    /// </summary>
     public void BuildPossibilities()
     {
         for (var i = 0; i < boardLen; i++)
         for (var j = 0; j < boardLen; j++)
             if (board[i, j].Value == '0')
                 for (var k = '1'; k <= boardLen + '0'; k++)
-                    //expain checkrow/chekcol...
                     if (CheckRow(i, k) == 0 && CheckColumn(j, k) == 0 && CheckSquare(i, j, k) == 0)
                         board[i, j].PossibleValues.Add(k);
     }
-
+    /// <summary>
+    /// this function clears all the possible values for each cell
+    /// </summary>
     public void ClearPossibleValues()
     {
         for (var i = 0; i < boardLen; i++)
         for (var j = 0; j < boardLen; j++)
             board[i, j].PossibleValues.Clear();
     }
-
+    /// <summary>
+    /// this function checks the amount of times a value appears in a row
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="value"></param>
+    /// <returns>count</returns>
     private int CheckRow(int row, char value)
     {
         var count = 0;
@@ -111,7 +138,12 @@ public class Board : ICloneable
 
         return count;
     }
-
+    /// <summary>
+    /// this function checks the amount of times a value appears in a column
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="value"></param>
+    /// <returns>count</returns>
     private int CheckColumn(int column, char value)
     {
         var count = 0;
@@ -121,7 +153,13 @@ public class Board : ICloneable
 
         return count;
     }
-
+    /// <summary>
+    /// this function checks the amount of times a value appears in a square
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="column"></param>
+    /// <param name="value"></param>
+    /// <returns>count</returns>
     private int CheckSquare(int row, int column, char value)
     {
         var squareSize = (int)Math.Sqrt(boardLen);
@@ -136,8 +174,9 @@ public class Board : ICloneable
         return count;
     }
 
-
-    // print the board like a grid that each value is in a cell
+    /// <summary>
+    /// this function prints the board
+    /// </summary>
     public void PrintBoard()
     {
         Console.WriteLine();
@@ -162,8 +201,10 @@ public class Board : ICloneable
 
         Console.WriteLine("+");
     }
-
-    //check if the board is valid
+    /// <summary>
+    /// this function checks if the board is valid
+    /// </summary>
+    /// <returns>bool</returns>
     public bool IsValid()
     {
         for (var i = 0; i < boardLen; i++)
@@ -175,7 +216,10 @@ public class Board : ICloneable
 
         return true;
     }
-
+    /// <summary>
+    /// convert board to string
+    /// </summary>
+    /// <returns>return string of all chars in the board</returns>
     public string BoardToString()
     {
         var final = "";
@@ -185,108 +229,12 @@ public class Board : ICloneable
 
         return final;
     }
-
-
-    /*
-    public bool Solve()
-    {
-        if (!IsValid())
-        {
-            return false;
-        }
-
-        BuildPossibilities();
-        if (IsSolved())
-        {
-            return true;
-        }
-
-        Cell cell = GetCellWithFewestPossibilities();
-        if (cell.PossibleValues.Count == 0)
-        {
-            return false;
-        }
-
-        foreach (char value in cell.PossibleValues.ToArray())
-        {
-            cell.Value = value;
-            if (Solve())
-            {
-                return true;
-            }
-
-            cell.Value = '0';
-            BuildPossibilities();
-            
-        }
-
-        return false;
-    }
-
-    bool IsSolved()
-    {
-        for (int i = 0; i < boardLen; i++)
-        {
-            for (int j = 0; j < boardLen; j++)
-            {
-                if (board[i, j].Value == '0')
-                {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-    Cell GetCellWithFewestPossibilities()
-    {
-        Cell cell = new Cell('0', 0, 0);
-        int min = boardLen + 1;
-        for (int i = 0; i < boardLen; i++)
-        {
-            for (int j = 0; j < boardLen; j++)
-            {
-                if (board[i, j].Value == '0' && board[i, j].PossibleValues.Count < min)
-                {
-                    min = board[i, j].PossibleValues.Count;
-                    cell = board[i, j];
-                }
-            }
-        }
-
-        return cell;
-    }
-    */
-    public bool IsValid(char num, int row, int col)
-    {
-        // Check if the number is present in the same row
-        for (var i = 0; i < boardLen; i++)
-            if (board[row, i].Value == num)
-                return false;
-
-        // Check if the number is present in the same column
-        for (var i = 0; i < boardLen; i++)
-            if (board[i, col].Value == num)
-                return false;
-
-        // Check if the number is present in the same subgrid
-        var startRow = row - row % (int)Math.Sqrt(boardLen);
-        var startCol = col - col % (int)Math.Sqrt(boardLen);
-        for (var i = 0; i < (int)Math.Sqrt(boardLen); i++)
-        for (var j = 0; j < (int)Math.Sqrt(boardLen); j++)
-            if (board[startRow + i, startCol + j].Value == num)
-                return false;
-
-        // If the number is not present in the same row, column, or subgrid, it is valid
-        return true;
-    }
-
-    public void RemovePossibleValueFromPeer(Cell cell)
-    {
-        foreach (var (row, col) in cell.Peers) board[row, col].PossibleValues.Remove(cell.Value);
-    }
-
+    /// <summary>
+    /// check if the given char is valid in his rows&&cols&&boxs
+    /// </summary>
+    /// <param name="cell"></param>
+    /// <param name="num"></param>
+    /// <returns>true if can fit false if cant</returns>
     public bool IsValid(Cell cell, char num)
     {
         foreach (var (row, col) in cell.Peers)
@@ -296,35 +244,4 @@ public class Board : ICloneable
         return true;
     }
 
-    public void RestorePossibleValueFromPeer(Cell cell)
-    {
-        foreach (var (row, col) in cell.Peers) board[row, col].PossibleValues.Add(cell.Value);
-    }
-
-    // find the cell with the fewest possibilities
-    public Cell GetCellWithFewestPossibilities()
-    {
-        var cell = new Cell('0', 0, 0, boardLen);
-        var min = boardLen + 1;
-        for (var i = 0; i < boardLen; i++)
-        for (var j = 0; j < boardLen; j++)
-            if (board[i, j].Value == '0' && board[i, j].PossibleValues.Count < min)
-            {
-                min = board[i, j].PossibleValues.Count;
-                cell = board[i, j];
-            }
-
-        return cell;
-    }
-
-    public int CountAmountOfSolvedCells()
-    {
-        var count = 0;
-        for (var i = 0; i < boardLen; i++)
-        for (var j = 0; j < boardLen; j++)
-            if (board[i, j].Value != '0')
-                count++;
-
-        return count;
-    }
 }
